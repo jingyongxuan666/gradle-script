@@ -139,7 +139,7 @@
    apply from: "$build_script_url/build-module.gradle"
    
    android {
-   		xxx
+      xxx
    }
    
    dependencies {
@@ -157,12 +157,12 @@
    apply from: "$build_script_url/build-lib.gradle"
    
    android {
-   		xxx
+      xxx
    }
    
    dependencies {
        androidTestImplementation 'xxx'
-   		implementation 'xxx'
+       implementation 'xxx'
    }
    ```
 
