@@ -14,7 +14,7 @@ ext {
     maven_description = "描述"
     maven_groupId = "com.joyratel.android"
 }
-apply from: "${rootProject.rootDir}/gradle-script/maven/publish-aar-3rd.gradle"
+apply from: "$build_script_url/maven/publish-aar-3rd.gradle"
 
 */
 
@@ -32,7 +32,7 @@ publishing {
             artifact maven_artifact_file_path
 
             // 如需要启用pom，调用方需要下一行代码，目的：加入apply plugin:android,才有debug等buildType
-            // apply from: "${rootProject.rootDir}/gradle-script/build-lib.gradle"，
+            // apply from: "$build_script_url/build-lib.gradle"，
 
             // To include project dependencies
 //            pom.withXml {

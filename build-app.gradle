@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 // 基础module
-apply from: "${rootProject.rootDir}/gradle-script/build-base.gradle"
+apply from: "$build_script_url/build-base.gradle"
 
 // 资源混淆
 apply plugin: 'AndResGuard'
-apply from: "${rootProject.rootDir}/gradle-script/feature/andResguard.gradle"
+apply from: "$build_script_url/feature/android-res-guard.gradle"
 
 
 android {

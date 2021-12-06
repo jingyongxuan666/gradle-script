@@ -16,7 +16,7 @@ ext {
     maven_groupId = "com.joyratel.android"
 }
 
-apply from: "${rootProject.rootDir}/gradle-script/maven/publish-aar.gradle"
+apply from: "$build_script_url/maven/publish-aar.gradle"
 
 */
 

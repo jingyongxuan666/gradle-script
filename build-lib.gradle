@@ -1,5 +1,5 @@
 // ⚠️lib：基础模块依赖库，与业务无关的依赖库。用于模块化分层。如：网络库、图片加载库等。
 apply plugin: 'com.android.library'
-apply from: "${rootProject.rootDir}/gradle-script/build-base.gradle"
+apply from: "$build_script_url/build-base.gradle"
 
 

@@ -2,7 +2,7 @@
 
 1. 每创建一个Project，就要配置一堆gradle的东西，需要有个模板配置
 2. 每个gradle文件可以有单一职责，不希望一个gradle文件中有几百行，不能快速查找或定位需要位置，如资源混淆白名单混在build.gradle中
-3. 不同module之间，各依赖的版本号混乱，希望有个统一管理
+3. 不同module之间，依赖的第三方库版本号混乱，希望有个统一管理
 4. 项目模块化后，可减少每个模块中gradle的模板代码
 5. 后期可快速转为kts构建
 
@@ -21,29 +21,41 @@
 
 # 使用方式
 
-1. 
+1. 在项目根目录的gradle.properties文件中添加以下内容
+   ```
+   # gradle-script脚本地址
+   build_script_url = https://raw.githubusercontent.com/phoenixsky/gradle-script/master
+   ```
 
-2. 将gradle-scrpt文件夹copy到project根目录下
-
-3. 修改project的build.gradle文件
+2. 修改project的build.gradle文件
 
    ```
    // Top-level build file where you can add configuration options common to all sub-projects/modules.
    buildscript {
-       // ① 导入配置文件
-       apply from: "${rootProject.rootDir}/gradle-script/build-script.gradle"
-       // ② 替换repo
-       repositories config.repositories
-       // ③ 替换Gradle插件依赖
-       dependencies config.pluginDeps
+        // ① 导入配置文件
+        apply from: "$build_script_url/build-script.gradle"
+        // ② 替换repo
+        repositories config.repositories
+        // ③ 根据gradle/wrapper/gradle-wrapper.properties中的gradle版本指定
+        dependencies {
+            //  6.7.1 -> 4.2.0
+            //  7.3   -> 7.0.3
+            classpath 'com.android.tools.build:gradle:4.2.0'
+        }
+        // ④ 替换Gradle插件依赖
+        dependencies config.pluginDeps
    }
    
-   // ④ 代码仓库依赖
+   // ⑤运行时仓库依赖
    allprojects {
        repositories config.repositories
+       configurations.all {
+           resolutionStrategy config.resolutionStrategy
+           resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+       }
    }
    
-   // ⑤Gradle Task
+   // ⑥Gradle Task （可选）
    // 引入版本check
    apply from: './gradle-script/feature/check-deps-version.gradle'
    
@@ -59,7 +71,7 @@
    }
    ```
 
-4. 移除setting.gradle里的`dependencyResolutionManagement`相关代码
+5. 移除setting.gradle里的`dependencyResolutionManagement`相关代码（if 7.0项目）
 
    ```
    // 移除
@@ -78,7 +90,7 @@
 4. App模块可直接将build修改为以下内容
 
    ```
-   apply from: "${rootProject.rootDir}/gradle-script/build-app.gradle"
+   apply from: "$build_script_url/build-app.gradle"
    ```
 
    仅一句话app的build.gradle的配置就已经完毕，如需要添加定制各种业务逻辑和不同使用场景，可直接在当前的build.gradle文件继续添加。
@@ -89,7 +101,7 @@
     2. 如添加`android`部分，同名覆盖，非同名新增
 
    ```
-   apply from: "${rootProject.rootDir}/gradle-script/base-app.gradle"
+   apply from: "$build_script_url/base-app.gradle"
    // if you need but it's deprecated，viewbinding better
    apply plugin: 'kotlin-android-extensions'
    
@@ -114,7 +126,7 @@
    
    dependencies {
        androidTestImplementation 'xxx'
-   		implementation 'xxx'
+       implementation 'xxx'
    }
    ```
 
@@ -123,10 +135,8 @@
 5. module(业务含UI)模块
 
    ```
-   apply plugin: 'com.android.library'
-   
    // 基础module
-   apply from: "${rootProject.rootDir}/gradle-script/build-module.gradle"
+   apply from: "$build_script_url/build-module.gradle"
    
    android {
    		xxx
@@ -134,7 +144,7 @@
    
    dependencies {
        androidTestImplementation 'xxx'
-   		implementation 'xxx'
+       implementation 'xxx'
    }
    ```
 
@@ -143,10 +153,8 @@
 6. lib(功能无UI)模块可直接将build修改为如下内容
 
    ```
-   // android library
-   apply plugin: 'com.android.library'
    // 基础lib
-   apply from: "${rootProject.rootDir}/gradle-script/build-lib.gradle"
+   apply from: "$build_script_url/build-lib.gradle"
    
    android {
    		xxx
