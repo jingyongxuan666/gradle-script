@@ -1,0 +1,74 @@
+/*
+⚠️上传aar到私有maven，根据maven_is_snapshot决定上传到snapshot还是release仓库
+
+🚀🚀🚀
+1. 将以下代码copy到需要被上传的module的build.gradle中
+2. 编译后在IDE侧边gradle视窗:${Module}/Tasks/publishing/，执行publish
+🚀🚀🚀
+
+ext {
+    maven_is_snapshot = true
+    maven_artifact_file_path = "./xxx.aar"
+    maven_build_type = "debug" // debug、release、pre、alpha
+    maven_version = "x.x.x"
+    maven_artifactId = "名字"
+    maven_description = "描述"
+    maven_groupId = "com.joyratel.android"
+}
+
+apply from: "${rootProject.rootDir}/gradle-script/maven/publish-aar.gradle"
+
+*/
+
+// ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ 使用方式 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑
+
+
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        "${maven_build_type}"(MavenPublication) {
+            groupId maven_groupId
+            artifactId maven_artifactId
+            // 0.0.1-debug-snapshot 不含buildType，适用于自有module，需要不同的buildType
+            version maven_version + "-" + maven_build_type + (maven_is_snapshot ? "-SNAPSHOT" : "")
+            artifact maven_artifact_file_path
+
+            // To include project dependencies
+            pom.withXml {
+                def dependencies = asNode().appendNode('dependencies')
+                // maven_build_type 根据build_type上传相应的dependencies.
+                // 如debugImplementation、releaseImplementation等，根据buildType
+                configurations.getByName("${maven_build_type}CompileClasspath").getResolvedConfiguration().getFirstLevelModuleDependencies().each {
+                    def dependency = dependencies.appendNode('dependency')
+                    dependency.appendNode('groupId', it.moduleGroup)
+                    dependency.appendNode('artifactId', it.moduleName)
+                    dependency.appendNode('version', it.moduleVersion)
+                }
+                asNode().appendNode("description", maven_description)
+            }
+        }
+    }
+    repositories {
+        maven {
+            if (maven_is_snapshot) {
+                url maven_snapshots_url
+            } else {
+                url maven_releases_url
+            }
+            credentials(HttpHeaderCredentials) {
+                name = "Private-Token"
+                if (maven_is_snapshot) {
+                    value = maven_snapshots_gitLabAccessToken
+                } else {
+                    value = maven_releases_gitLabAccessToken
+                }
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+        }
+    }
+}
+
+

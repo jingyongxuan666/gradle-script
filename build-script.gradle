@@ -1,0 +1,312 @@
+def androidSdk = [
+        "compileSdk": 31,
+        "minSdk"    : 21,
+        "targetSdk" : 26,
+]
+
+// 仓库
+def repositories = {
+    // 保持顺序
+    maven { url 'https://maven.aliyun.com/repository/google' }
+    // central仓和jcenter仓的聚合仓
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+    maven { url 'https://www.jitpack.io' }
+
+    maven { url 'https://developer.huawei.com/repo/' }
+
+    // 汇量
+    maven {
+        url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_china"
+    }
+    // 火山
+    maven {
+        url 'https://artifact.bytedance.com/repository/Volcengine/'
+    }
+    // 穿山甲
+    maven {
+        url 'https://artifact.bytedance.com/repository/pangle'
+    }
+    // JSFC
+    // 私有化maven
+    maven {
+        allowInsecureProtocol = true
+        url maven_releases_url
+        name "maven-releases"
+        credentials(HttpHeaderCredentials) {
+            name = 'Private-Token'
+            value = maven_releases_gitLabAccessToken
+        }
+        authentication {
+            header(HttpHeaderAuthentication)
+        }
+    }
+
+    maven {
+        allowInsecureProtocol = true
+        url maven_snapshots_url
+        name "maven-snapshots"
+        credentials(HttpHeaderCredentials) {
+            name = 'Private-Token'
+            value = maven_snapshots_gitLabAccessToken
+        }
+        authentication {
+            header(HttpHeaderAuthentication)
+        }
+    }
+
+    maven {
+        allowInsecureProtocol = true
+        url maven_3rd_url
+        credentials(HttpHeaderCredentials) {
+            name = "Private-Token"
+            value = maven_3rd_gitLabAccessToken
+        }
+        authentication {
+            header(HttpHeaderAuthentication)
+        }
+    }
+
+    // 此配置会报此⚠️：Using flatDir should be avoided because it doesn't support any meta-data formats
+    // 解决办法：发布aar到一个本地或远程仓库，然后进行aar的依赖
+    // flatDir {
+    //    dirs 'libs'
+    // }
+}
+
+def versions = [
+        androidPlugin   : "4.2.0",  // 6.7.1
+        // androidPlugin   : "7.0.3", // 7.0.3
+        kotlin          : "1.6.0",
+        andResGuard     : "1.2.20", // 资源混淆，jenkins打包脚本版本过低无法升级1.2.21
+        andResGuardJSFC : "1.2.2102", // 针对gradle7.0和M1芯片适配 私有化部署
+        mavenUpload     : "2.1",    // 私有化部署
+        checkDepsVersion: "0.39.0", // 依赖版本检查
+]
+
+def pluginDeps = {
+    // classpath 'com.android.tools.build:gradle:4.2.0' // 调用方来决定
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
+    // 资源混淆
+    classpath "com.tencent.mm:AndResGuard-gradle-plugin:${versions.andResGuard}"
+    // 依赖版本check
+    classpath "com.github.ben-manes:gradle-versions-plugin:${versions.checkDepsVersion}"
+    // 华为
+    classpath 'com.huawei.agconnect:agcp:1.2.1.301'
+    // 字符串混淆
+    classpath 'com.github.megatronking.stringfog:gradle-plugin:2.2.1'
+    // 选用加解密算法库，默认实现了xor和aes-cbc两种简单算法，也可以使用自己的加解密库。
+    classpath 'com.github.megatronking.stringfog:xor:1.1.0'
+    // maven上传
+    classpath "com.joyratel.plugin:uploadplugin:0.0.4-SNAPSHOT"
+}
+
+def depsVersion = [
+        core            : "1.7.0",
+        appcompat       : "1.4.0",
+        annotation      : "1.3.0",
+        activity        : "1.4.0",
+        fragment        : "1.3.6",
+        lifecycle       : "2.4.0",
+
+        coroutines      : "1.5.2",
+
+        navigation      : "2.3.5",
+        startup         : "1.1.0",  // https://developer.android.com/jetpack/androidx/releases/startup
+        work            : "2.7.1",
+        sqlite          : "2.1.0",
+
+        collection      : "1.1.0",
+        gson            : "2.8.5",
+
+        okhttp          : "4.9.0",
+        retrofit        : "2.9.0",
+
+        rx2             : "2.2.21",
+
+        statefulLiveData: "1.1.0",
+
+        // test
+        javaJunit       : "4.13.2", // https://junit.org/junit4/
+        junit           : "1.1.3",  // https://developer.android.com/jetpack/androidx/releases/test
+        espresso        : "3.4.0",
+]
+
+
+def deps = [
+
+        android: [
+                core              : "androidx.core:core-ktx:${depsVersion.core}",
+                appcompat         : "androidx.appcompat:appcompat:${depsVersion.appcompat}",
+                annotation        : "androidx.annotation:annotation:${depsVersion.annotation}",
+                activity          : "androidx.activity:activity:${depsVersion.activity}",
+                activityKtx       : "androidx.activity:activity-ktx:${depsVersion.activity}",
+                fragment          : "androidx.fragment:fragment:${depsVersion.fragment}",
+                fragmentKtx       : "androidx.fragment:fragment-ktx:${depsVersion.fragment}",
+
+                // lifecycle
+                lifecycle         : "androidx.lifecycle:lifecycle-runtime:${depsVersion.lifecycle}",
+                lifecycleKtx      : "androidx.lifecycle:lifecycle-runtime-ktx:${depsVersion.lifecycle}",
+                lifecycleProcess  : "androidx.lifecycle:lifecycle-process:${depsVersion.lifecycle}",
+                viewmodel         : "androidx.lifecycle:lifecycle-viewmodel:${depsVersion.lifecycle}",
+                viewmodelKtx      : "androidx.lifecycle:lifecycle-viewmodel-ktx:${depsVersion.lifecycle}",
+                viewmodelSavestate: "androidx.lifecycle:lifecycle-viewmodel-savedstate:${depsVersion.lifecycle}",
+                livedata          : "androidx.lifecycle:lifecycle-livedata:${depsVersion.lifecycle}",
+                livedataktx       : "androidx.lifecycle:lifecycle-livedata-ktx:${depsVersion.lifecycle}",
+                livedataCore      : "androidx.lifecycle:lifecycle-livedata-core:${depsVersion.lifecycle}",
+                livedataCoreKtx   : "androidx.lifecycle:lifecycle-livedata-core-ktx:${depsVersion.lifecycle}",
+                reactivestreams   : "androidx.lifecycle:lifecycle-reactivestreams:${depsVersion.lifecycle}",
+
+                // navigation
+                navigation        : "androidx.navigation:navigation-fragment-ktx:${depsVersion.navigation}",
+                navigationUI      : "androidx.navigation:navigation-ui-ktx:${depsVersion.navigation}",
+
+                // component
+                startup           : "androidx.startup:startup-runtime:${depsVersion.startup}",
+                work              : "androidx.work:work-runtime:${depsVersion.work}",
+                workKtx           : "androidx.work:work-runtime-ktx:${depsVersion.work}",
+                sqlite            : "androidx.sqlite:sqlite:${depsVersion.sqlite}",
+                multidex          : "androidx.multidex:multidex:2.0.1",
+
+                // data
+                collection        : "androidx.collection:collection-ktx:${depsVersion.collection}",
+
+                // UI
+                material          : "com.google.android.material:material:1.4.0",
+                constraintlayout  : "androidx.constraintlayout:constraintlayout:2.1.1",
+                recyclerview      : "androidx.recyclerview:recyclerview:1.2.1",
+                swiperefreshlayout: "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0",
+                cardview          : "androidx.cardview:cardview:1.0.0",
+                flexbox           : "com.google.android.flexbox:flexbox:3.0.0",
+
+                // base
+                gson              : "com.google.code.gson:gson:${depsVersion.gson}",
+
+        ],
+        kotlin : [
+                stdlibCommon: "org.jetbrains.kotlin:kotlin-stdlib-common:${versions.kotlin}",
+                stdlib      : "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
+                stdlib7     : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
+                stdlib8     : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}",
+
+                coroutines  : [
+                        coreJvm: "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:${depsVersion.coroutines}",
+                        android: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${depsVersion.coroutines}",
+                        jdk8   : "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${depsVersion.coroutines}",
+                        rx2    : "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:${depsVersion.coroutines}",
+                        test   : "org.jetbrains.kotlinx:kotlinx-coroutines-test:${depsVersion.coroutines}",
+                ],
+        ],
+//        kotlin : [
+//                android: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${depsVersion.coroutines}",
+//                jdk8   : "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${depsVersion.coroutines}",
+//                rx2    : "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:${depsVersion.coroutines}",
+//        ],
+
+
+        http   : [
+                okhttp            : "com.squareup.okhttp3:okhttp:${depsVersion.okhttp}",
+                interceptorLogging: "com.squareup.okhttp3:logging-interceptor:${depsVersion.okhttp}",
+                retrofit          : "com.squareup.retrofit2:retrofit:${depsVersion.retrofit}",
+                converterGson     : "com.squareup.retrofit2:converter-gson:${depsVersion.retrofit}",
+        ],
+
+        rx     : [
+                rx2       : "io.reactivex.rxjava2:rxjava:$depsVersion.rx2",
+                rx2Android: "io.reactivex.rxjava2:rxandroid:2.1.1",
+                rx3       : "io.reactivex.rxjava3:rxjava3:$depsVersion.rx3",
+                rx3Android: "io.reactivex.rxjava3:rxandroid:3.0.0",
+        ],
+
+
+        third  : [
+                statefulLiveDataCore  : "com.github.climacell.statefullivedata:core:${depsVersion.statefulLiveData}",
+                statefulLiveCoroutines: "com.github.climacell.statefullivedata:coroutines:${depsVersion.statefulLiveData}",
+                statefulLiveRetrofit  : "com.github.climacell.statefullivedata:retrofit:${depsVersion.statefulLiveData}",
+
+                x5webview             : "com.tencent.tbs:tbssdk:44085",
+        ],
+
+
+        test   : [
+                javaJunit: "junit:junit:${depsVersion.javaJunit}",
+                junit    : "androidx.test.ext:junit-ktx:${depsVersion.junit}",
+                espresso : "androidx.test.espresso:espresso-core:${depsVersion.espresso}",
+                core     : "androidx.test:core-ktx:1.4.0",
+        ],
+
+
+]
+
+// 强制依赖，去除多余版本
+def resolutionStrategy = {
+    force deps.android.appcompat
+    force deps.android.core
+    force deps.android.activity
+    force deps.android.activityKtx
+    force deps.android.fragment
+    force deps.android.fragmentKtx
+
+    force deps.android.lifecycle
+    force deps.android.lifecycleKtx
+    force deps.android.lifecycleProcess
+    force deps.android.viewmodel
+    force deps.android.viewmodelKtx
+    force deps.android.viewmodelSavestate
+    force deps.android.livedata
+    force deps.android.livedataktx
+    force deps.android.livedataCore
+    force deps.android.livedataCoreKtx
+    force deps.android.reactivestreams
+
+    force deps.android.navigation
+    force deps.android.startup
+    force deps.android.work
+    force deps.android.workKtx
+    force deps.android.sqlite
+    force "androidx.sqlite:sqlite-framework:${depsVersion.sqlite}"
+
+    force deps.android.collection
+
+    force deps.android.material
+    force deps.android.constraintlayout
+    force deps.android.recyclerview
+    force deps.android.swiperefreshlayout
+    force deps.android.cardview
+
+    force deps.kotlin.stdlibCommon
+    force deps.kotlin.stdlib
+    force deps.kotlin.stdlib7
+    force deps.kotlin.stdlib8
+
+    force deps.kotlin.coroutines.coreJvm
+    force deps.kotlin.coroutines.android
+    force deps.kotlin.coroutines.jdk8
+    force deps.kotlin.coroutines.rx2
+    force deps.kotlin.coroutines.test
+
+
+    force deps.rx.rx2
+    force deps.rx.rx2Android
+    force deps.rx.rx3
+    force deps.rx.rx3Android
+
+    // test
+    force deps.test.javaJunit
+    force deps.test.junit
+    force "androidx.test.ext:junit:${depsVersion.junit}"
+    force deps.test.espresso
+}
+
+
+// ⚠️必须在底部，新增属性需在在这里添加
+ext.config = [
+        "repositories"      : repositories,
+        "pluginDeps"        : pluginDeps,
+        "androidSdk"        : androidSdk,
+        "versions"          : versions,
+        "gradlePlugin"      : gradlePlugin,
+        "resolutionStrategy": resolutionStrategy,
+        "deps"              : deps,
+]
+

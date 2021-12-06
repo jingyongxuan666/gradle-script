@@ -1,0 +1,31 @@
+// ⚠️module：业务模块依赖库。用于模块化分层。如：用户模块、订单模块等。
+apply plugin: 'com.android.library'
+apply from: "${rootProject.rootDir}/gradle-script/build-base.gradle"
+
+
+android {
+    buildTypes {
+        release {
+
+        }
+        debug {
+
+        }
+        alpha {
+            matchingFallbacks = ['debug']
+        }
+        pre {
+            matchingFallbacks = ['release']
+        }
+    }
+}
+
+dependencies {
+
+    // http
+    implementation config.deps.http.okhttp
+    implementation config.deps.http.interceptorLogging
+    implementation config.deps.http.retrofit
+    implementation config.deps.http.converterGson
+
+}

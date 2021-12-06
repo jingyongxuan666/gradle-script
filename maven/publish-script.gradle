@@ -1,0 +1,52 @@
+apply plugin: 'maven-publish'
+
+def getArtifactFilePath() {
+    return "$buildDir/outputs/aar/$maven_artifactId-$maven_version-${maven_build_type}.aar";
+}
+
+def getPublicationName() {
+    return maven_build_type;
+}
+
+publishing {
+    publications {
+        "${getPublicationName()}"(MavenPublication) {
+            groupId maven_groupId
+            artifactId maven_artifactId
+            version maven_version + "-" + maven_build_type + (maven_is_snapshot ? "-SNAPSHOT" : "")
+            artifact getArtifactFilePath()
+
+            // To include project dependencies
+            pom.withXml {
+                def dependencies = asNode().appendNode('dependencies')
+                configurations.getByName("${getPublicationName()}CompileClasspath").getResolvedConfiguration().getFirstLevelModuleDependencies().each {
+                    def dependency = dependencies.appendNode('dependency')
+                    dependency.appendNode('groupId', it.moduleGroup)
+                    dependency.appendNode('artifactId', it.moduleName)
+                    dependency.appendNode('version', it.moduleVersion)
+                }
+                asNode().appendNode("description", maven_description)
+            }
+        }
+    }
+    repositories {
+        maven {
+            if ("release".equals(maven_build_type)) {
+                url maven_releases_url
+            } else {
+                url maven_snapshots_url
+            }
+            credentials(HttpHeaderCredentials) {
+                name = "Private-Token"
+                if ("release".equals(maven_build_type)) {
+                    value = maven_releases_gitLabAccessToken
+                } else {
+                    value = maven_snapshots_gitLabAccessToken
+                }
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+        }
+    }
+}

@@ -1,0 +1,85 @@
+// ⚠️用于抽取lib和app的公共部分
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+apply from: "${rootProject.rootDir}/gradle-script/build-script.gradle"
+
+android {
+    compileSdk config.androidSdk.compileSdk
+    defaultConfig {
+        minSdk config.androidSdk.minSdk
+        targetSdk config.androidSdk.targetSdk
+        // 将lib的混淆文件规则合并到app
+        consumerProguardFiles "proguard-rules.pro"
+
+        flavorDimensions "versionCode"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+
+        }
+        alpha {
+            matchingFallbacks = ['debug']
+        }
+        pre {
+            matchingFallbacks = ['release']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // androidx
+    implementation config.deps.android.appcompat
+    implementation config.deps.android.fragmentKtx
+
+    // lifecycle
+    // implementation config.deps.android.lifecycle
+    implementation config.deps.android.lifecycleProcess
+//     implementation config.deps.android.viewmodel
+    implementation config.deps.android.viewmodelSavestate
+    implementation config.deps.android.livedata
+
+    // navigation
+    implementation config.deps.android.navigation
+    implementation config.deps.android.navigationUI
+
+    implementation config.deps.android.collection
+
+    // view
+    implementation config.deps.android.material
+    implementation config.deps.android.constraintlayout
+    implementation config.deps.android.recyclerview
+    implementation config.deps.android.swiperefreshlayout
+    implementation config.deps.android.flexbox
+
+    // kotlin
+    implementation config.deps.kotlin.coroutines.android
+    implementation config.deps.kotlin.coroutines.jdk8
+
+
+    // test
+    testImplementation config.deps.test.javaJunit
+    testImplementation config.deps.kotlin.coroutines.test
+    androidTestImplementation config.deps.test.junit
+    androidTestImplementation config.deps.test.espresso
+
+
+}
