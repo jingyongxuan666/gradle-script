@@ -12,7 +12,7 @@ ext {
     maven_artifactId = "名字"
 
     maven_description = "描述"
-    maven_groupId = "com.joyratel.android"
+    maven_groupId = "com.xxx.android"
 }
 apply from: "$build_script_url/maven/publish-aar-3rd.gradle"
 

@@ -95,8 +95,6 @@ def pluginDeps = {
     classpath 'com.github.megatronking.stringfog:gradle-plugin:2.2.1'
     // 选用加解密算法库，默认实现了xor和aes-cbc两种简单算法，也可以使用自己的加解密库。
     classpath 'com.github.megatronking.stringfog:xor:1.1.0'
-    // maven上传
-    classpath "com.joyratel.plugin:uploadplugin:0.0.4-SNAPSHOT"
 }
 
 def depsVersion = [
