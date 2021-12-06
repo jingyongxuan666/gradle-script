@@ -3,7 +3,8 @@
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
-apply from: "$build_script_url/build-script.gradle"
+// apply from: "$build_script_url/build-script.gradle"
+apply from: resources.text.fromInsecureUri("$build_script_url/build-script.gradle")
 
 
 android {
