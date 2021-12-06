@@ -1,0 +1,91 @@
+/*
+⚠️上传aar到私有maven，根据maven_is_snapshot决定上传到snapshot还是release仓库
+
+🚀🚀🚀
+1. 将以下代码copy到需要被上传的module的build.gradle中
+2. 编译后在IDE侧边gradle视窗:${Module}/Tasks/aaa自定义插件，执行发布快照或发布正式版
+🚀🚀🚀
+
+ext {
+    maven_is_snapshot = true    // 是否在快照仓库
+    maven_build_type = "debug"  // debug、release、pre、alpha
+    maven_version = "0.0.1"     // 版本号需要和模块设置的一致
+    maven_artifactId = project.getName()    // 直接取module的名称
+    maven_description = "xxx"      // 描述
+    maven_groupId = "com.joyratel.android"
+}
+apply from: "$build_script_url/maven/publish-module.gradle"
+
+
+
+*/
+
+// ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ 使用方式 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑
+
+apply plugin: 'com.joyratel.uploadplugin'
+apply plugin: 'maven-publish'
+
+apply from: "$build_script_url/maven/publish-script.gradle"
+
+
+/**
+ * 上传信息相关配置
+ */
+upload {
+    /**
+     * 模块名称
+     */
+    modelName = "${maven_artifactId}模块"
+    /**
+     * maven groupId
+     */
+    mavenGroupId = maven_groupId
+    /**
+     * maven artifactId
+     */
+    mavenArtifactId = maven_artifactId
+    /**
+     * maven versionName
+     */
+    mavenVersionName = maven_version
+
+    /**
+     * 更新描述
+     */
+    updateDesc = maven_description
+
+    /**
+     * 生成文件的名字，比如文件为junk-0.0.1-debug-SNAPSHOT.aar
+     * 注意：这个文件名字要和 gradle-mvn-push.gradle 中使用的上传文件名字相同，否则会上传失败
+     */
+    name = "$maven_artifactId-$maven_version-$maven_build_type"
+}
+
+/**
+ * 钉钉 相关配置
+ */
+dingTalk_config {
+    /**
+     * 群机器人对应的 webHook
+     */
+    webHook = "xxx"
+    /**
+     * 群机器人对应的 secret
+     */
+    secret = "xxx"
+    /**
+     * maven snapshot地址，不用修改
+     */
+    maven_snapshots_url = "xxx"
+    /**
+     * maven release地址，不用修改
+     */
+    maven_release_url = "xxx"
+}
+
+
+
+
+
+
+
