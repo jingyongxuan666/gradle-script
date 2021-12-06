@@ -75,8 +75,6 @@ def repositories = {
 }
 
 def versions = [
-        androidPlugin   : "4.2.0",  // 6.7.1
-        // androidPlugin   : "7.0.3", // 7.0.3
         kotlin          : "1.6.0",
         andResGuard     : "1.2.20", // 资源混淆，jenkins打包脚本版本过低无法升级1.2.21
         andResGuardJSFC : "1.2.2102", // 针对gradle7.0和M1芯片适配 私有化部署
@@ -305,7 +303,6 @@ ext.config = [
         "pluginDeps"        : pluginDeps,
         "androidSdk"        : androidSdk,
         "versions"          : versions,
-        "gradlePlugin"      : gradlePlugin,
         "resolutionStrategy": resolutionStrategy,
         "deps"              : deps,
 ]
