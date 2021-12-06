@@ -21,9 +21,11 @@
 
 # 使用方式
 
-1. 将gradle-scrpt文件夹copy到project根目录下
+1. 
 
-2. 修改project的build.gradle文件
+2. 将gradle-scrpt文件夹copy到project根目录下
+
+3. 修改project的build.gradle文件
 
    ```
    // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -57,7 +59,7 @@
    }
    ```
 
-3. 移除setting.gradle里的`dependencyResolutionManagement`相关代码
+4. 移除setting.gradle里的`dependencyResolutionManagement`相关代码
 
    ```
    // 移除

@@ -3,7 +3,8 @@
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
-apply from: "${rootProject.rootDir}/gradle-script/build-script.gradle"
+apply from: "$build_script_url/build-script.gradle"
+
 
 android {
     compileSdk config.androidSdk.compileSdk
