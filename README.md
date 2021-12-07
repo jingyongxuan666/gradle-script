@@ -10,14 +10,13 @@
 
 1. 使用国内仓库阿里云，加快编译速度。
 2. 新建`build-script.gradle`统一配置plugin和project依赖的版本号
-3. 利用gradle的apply from 'xxx'的所谓`继承`的特性，封装一些模板代码：通过`app`继承`moudle`，`module`继承`lib`的方式，减少模板代码
+3. 利用gradle的apply from 'xxx'的所谓`继承`的特性，封装一些模板代码
 4. 配置常用gradleTask，如依赖版本检查等
 
 # 模块化module相关的定义
 
-1. `app`为壳工程
-2. `module-xxx`为业务模块，含UI（订单模块、用户登录模块）
-3. `lib-xxx`为基础模块，无UI（网络库、垃圾清理、JSBridge）
+1. `app`为壳工程，导入`build-app.gradle`文件
+2. lib为module，导入`build-lib.gradle`文件
 
 # 使用方式
 

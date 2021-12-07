@@ -1,17 +1,18 @@
-// ⚠️用于抽取lib和app的公共部分
+// 用来标识区分Project和Module的build.gradle
+ext.isModuleGradle = true
 
+// ⚠️用于抽取lib和app的公共部分
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
-// apply from: "$build_script_url/build-script.gradle"
-apply from: resources.text.fromInsecureUri("$build_script_url/build-script.gradle")
+apply from: buildScript
 
 
 android {
-    compileSdk config.androidSdk.compileSdk
+    compileSdk androidVersions.compileSdk
     defaultConfig {
-        minSdk config.androidSdk.minSdk
-        targetSdk config.androidSdk.targetSdk
+        minSdk androidVersions.minSdk
+        targetSdk androidVersions.targetSdk
         // 将lib的混淆文件规则合并到app
         consumerProguardFiles "proguard-rules.pro"
 

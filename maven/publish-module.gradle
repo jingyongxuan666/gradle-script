@@ -25,7 +25,7 @@ apply from: "$build_script_url/maven/publish-module.gradle"
 apply plugin: 'com.joyratel.uploadplugin'
 apply plugin: 'maven-publish'
 
-apply from: "$build_script_url/maven/publish-script.gradle"
+apply from: buildScriptMavenPublishScript
 
 
 /**

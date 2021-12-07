@@ -1,8 +1,28 @@
-def androidSdk = [
-        "compileSdk": 31,
-        "minSdk"    : 21,
-        "targetSdk" : 26,
+
+// 默认配置
+def defaultAndroidVersions = [
+    "compileSdk"  : 31,
+    "minSdk"      : 21,
+    "targetSdk"   : 26,
+    "gradlePlugin": "4.2.0", //  6.7.1 -> 4.2.0;    7.3  -> 7.0.3
+    "kotlin"      : "1.6.0",
 ]
+
+if(!project.hasProperty("isModuleGradle")){
+    // 如果没有自定义配置就读取默认配置
+    if (!project.hasProperty("androidVersions") || !(androidVersions instanceof Map)) {
+        println("androidVersions--> without androidVersions 采用默认配置")
+        ext.androidVersions = defaultAndroidVersions
+    } else {
+        println("androidVersions--> within androidVersions 采用自定义配置覆盖策略")
+        def setDefaultValue = { androidVersions[it] = androidVersions[it]?: defaultAndroidVersions[it] }
+        setDefaultValue("compileSdk")
+        setDefaultValue("minSdk")
+        setDefaultValue("targetSdk")
+        setDefaultValue("gradlePlugin")
+        setDefaultValue("kotlin")
+    }
+}
 
 // 仓库
 def repositories = {
@@ -67,34 +87,29 @@ def repositories = {
         }
     }
 
-    // 此配置会报此⚠️：Using flatDir should be avoided because it doesn't support any meta-data formats
-    // 解决办法：发布aar到一个本地或远程仓库，然后进行aar的依赖
-    // flatDir {
-    //    dirs 'libs'
-    // }
 }
 
-def versions = [
-        kotlin          : "1.6.0",
-        andResGuard     : "1.2.20", // 资源混淆，jenkins打包脚本版本过低无法升级1.2.21
-        andResGuardJSFC : "1.2.2102", // 针对gradle7.0和M1芯片适配 私有化部署
-        mavenUpload     : "2.1",    // 私有化部署
-        checkDepsVersion: "0.39.0", // 依赖版本检查
-]
-
 def pluginDeps = {
-    // classpath 'com.android.tools.build:gradle:4.2.0' // 调用方来决定
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
+    classpath "com.android.tools.build:gradle:${androidVersions.gradlePlugin}"
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${androidVersions.kotlin}"
     // 资源混淆
-    classpath "com.tencent.mm:AndResGuard-gradle-plugin:${versions.andResGuard}"
-    // 依赖版本check
-    classpath "com.github.ben-manes:gradle-versions-plugin:${versions.checkDepsVersion}"
+    classpath "com.tencent.mm:AndResGuard-gradle-plugin:1.2.20"
+    // 针对gradle7.0和M1芯片适配 私有化部署
+    // classpath "com.tencent.mm:AndResGuard-gradle-plugin:1.2.2102"
     // 华为
     classpath 'com.huawei.agconnect:agcp:1.2.1.301'
     // 字符串混淆
     classpath 'com.github.megatronking.stringfog:gradle-plugin:2.2.1'
     // 选用加解密算法库，默认实现了xor和aes-cbc两种简单算法，也可以使用自己的加解密库。
     classpath 'com.github.megatronking.stringfog:xor:1.1.0'
+    // 上传到maven的脚本插件
+    classpath "com.joyratel.plugin:uploadplugin:0.0.4-SNAPSHOT"
+
+    // ↓ ↓ ↓ 项目工具 ↓ ↓ ↓
+    // 依赖版本check
+    classpath "com.github.ben-manes:gradle-versions-plugin:0.39.0"
+
+
 }
 
 def depsVersion = [
@@ -180,10 +195,10 @@ def deps = [
 
         ],
         kotlin : [
-                stdlibCommon: "org.jetbrains.kotlin:kotlin-stdlib-common:${versions.kotlin}",
-                stdlib      : "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
-                stdlib7     : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
-                stdlib8     : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}",
+                stdlibCommon: "org.jetbrains.kotlin:kotlin-stdlib-common:${androidVersions.kotlin}",
+                stdlib      : "org.jetbrains.kotlin:kotlin-stdlib:${androidVersions.kotlin}",
+                stdlib7     : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${androidVersions.kotlin}",
+                stdlib8     : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${androidVersions.kotlin}",
 
                 coroutines  : [
                         coreJvm: "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:${depsVersion.coroutines}",
@@ -193,12 +208,6 @@ def deps = [
                         test   : "org.jetbrains.kotlinx:kotlinx-coroutines-test:${depsVersion.coroutines}",
                 ],
         ],
-//        kotlin : [
-//                android: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${depsVersion.coroutines}",
-//                jdk8   : "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${depsVersion.coroutines}",
-//                rx2    : "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:${depsVersion.coroutines}",
-//        ],
-
 
         http   : [
                 okhttp            : "com.squareup.okhttp3:okhttp:${depsVersion.okhttp}",
@@ -299,9 +308,39 @@ def resolutionStrategy = {
 ext.config = [
         "repositories"      : repositories,
         "pluginDeps"        : pluginDeps,
-        "androidSdk"        : androidSdk,
-        "versions"          : versions,
         "resolutionStrategy": resolutionStrategy,
         "deps"              : deps,
 ]
+
+
+def split = build_script_url.split("/files/build-script.gradle/")
+def build_script_url_prefix = split[0]
+def build_script_url_suffix = split[1]
+
+// 配置
+// http://gitlab.joyratel.com/api/v4/projects/55/repository/files/build-script.gradle/raw?ref=jsfc-1.0&private_token=EKqnZYzCypC5k8kqsV8F
+ext.spliceUrl = { "$build_script_url_prefix/files/${it}.gradle/$build_script_url_suffix" }
+// http://gitlab.joyratel.com/api/v4/projects/55/repository/blobs/02ea3066dbde2643e2b7ddf9ed878be34fbee2ca/raw?ref=jsfc-1.0&private_token=EKqnZYzCypC5k8kqsV8F
+ext.spliceSecondaryUrl = { "$build_script_url_prefix/blobs/${it}/$build_script_url_suffix" }
+
+
+
+ext {
+    buildScript = spliceUrl("build-script")
+    buildScriptBase = spliceUrl("build-base")
+    buildScriptModule = spliceUrl("build-module")
+    buildScriptLib = spliceUrl("build-lib")
+    buildScriptApp = spliceUrl("build-app")
+
+    // 二级目录
+    // 因当前gitlab配置问题需要暂时使用blob获取
+    buildScriptAndResGuard = spliceSecondaryUrl("88307703eaa8cd548f944ac80ba66fcf44d7f0f9")
+
+    buildScriptMavenPublishAAR3rd = spliceSecondaryUrl("4df6e9d13b819badc4c61bfb78dd59b5512f84e9")
+    buildScriptMavenPublishAAR3rdDeps = spliceSecondaryUrl("320428f3d3a20defaaa3ec572e4bbb9136f2be9f")
+    buildScriptMavenPublishAAR = spliceSecondaryUrl("5015e5a238973ffbd67db5fb76847a6d796c9290")
+    buildScriptMavenPublishModule = spliceSecondaryUrl("16a98ac448e95c3ada1addc37e9f4bb60d2bac98")
+    buildScriptMavenPublishScript = spliceSecondaryUrl("81fec155fe693a56ebef294e607072ca40b30860")
+}
+
 

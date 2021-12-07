@@ -1,6 +1,6 @@
 // ⚠️module：业务模块依赖库。用于模块化分层。如：用户模块、订单模块等。
 apply plugin: 'com.android.library'
-apply from: "$build_script_url/build-base.gradle"
+apply from: buildScriptBase
 
 
 android {
