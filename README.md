@@ -9,21 +9,31 @@
 # 优化思路
 
 1. 使用国内仓库阿里云，加快编译速度。
-2. 新建`build-script.gradle`统一配置plugin和project依赖的版本号
-3. 利用gradle的apply from 'xxx'的所谓`继承`的特性，封装一些模板代码
+2. `apply from: buildScript`统一配置plugin和project依赖的版本号
+3. 利用gradle的apply from: 'xxx' 的所谓`继承`的特性，封装一些模板代码
 4. 配置常用gradleTask，如依赖版本检查等
 
 # 模块化module相关的定义
 
-1. `app`为壳工程，导入`build-app.gradle`文件
-2. lib为module，导入`build-lib.gradle`文件
+1. `app`为壳工程，直接`apply from: buildScriptApp`
+2. `lib`为module，直接`apply from: buildScriptLib`
 
 # 使用方式
 
-1. 在项目根目录的gradle.properties文件中添加以下内容
+1. 在项目根目录的`gradle.properties`文件中添加以下内容
    ```
    # gradle-script脚本地址
-   build_script_url = https://raw.githubusercontent.com/phoenixsky/gradle-script/master
+   build_script_url = http://gitlab.joyratel.com/api/v4/projects/58/repository/files/build-script.gradle/raw?ref=jsfc-0.0.1&private_token=2QgyTHT3FBpyYPqrQjA_
+   
+   # 加入maven仓库的地址和token
+   maven_releases_url=http://gitlab.joyratel.com/api/v4/projects/46/packages/maven
+   maven_releases_gitLabAccessToken=xxx
+
+   maven_snapshots_url=http://gitlab.joyratel.com/api/v4/projects/47/packages/maven
+   maven_snapshots_gitLabAccessToken=xxx
+
+   maven_3rd_url=http://gitlab.joyratel.com/api/v4/projects/54/packages/maven
+   maven_3rd_gitLabAccessToken=xxx
    ```
 
 2. 修改project的build.gradle文件
@@ -31,21 +41,26 @@
    ```
    // Top-level build file where you can add configuration options common to all sub-projects/modules.
    buildscript {
+        // 可选，可单一覆盖配置android相关版本
+        ext {
+            androidVersions = [
+                    "compileSdk"  : 30,
+                    "minSdk"      : 21,
+                    "targetSdk"   : 26,
+                    "gradlePlugin": "4.2.0",
+                    "kotlin"      : "1.6.0",
+            ]
+        }
+        // 以下为必选 
         // ① 导入配置文件
-        apply from: "$build_script_url/build-script.gradle"
+        apply from: build_script_url
         // ② 替换repo
         repositories config.repositories
-        // ③ 根据gradle/wrapper/gradle-wrapper.properties中的gradle版本指定
-        dependencies {
-            //  6.7.1 -> 4.2.0
-            //  7.3   -> 7.0.3
-            classpath 'com.android.tools.build:gradle:4.2.0'
-        }
-        // ④ 替换Gradle插件依赖
+        // ③ 替换Gradle插件依赖
         dependencies config.pluginDeps
    }
    
-   // ⑤运行时仓库依赖
+   // ④ 运行时仓库依赖
    allprojects {
        repositories config.repositories
        configurations.all {
@@ -53,10 +68,6 @@
            resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
        }
    }
-   
-   // ⑥Gradle Task （可选）
-   // 引入版本check
-   apply from: './gradle-script/feature/check-deps-version.gradle'
    
    task clean(type: Delete) {
        delete rootProject.buildDir
@@ -85,11 +96,10 @@
    ```
 
 
-
 4. App模块可直接将build修改为以下内容
 
    ```
-   apply from: "$build_script_url/build-app.gradle"
+   apply from: buildScriptApp
    ```
 
    仅一句话app的build.gradle的配置就已经完毕，如需要添加定制各种业务逻辑和不同使用场景，可直接在当前的build.gradle文件继续添加。
@@ -100,7 +110,7 @@
     2. 如添加`android`部分，同名覆盖，非同名新增
 
    ```
-   apply from: "$build_script_url/base-app.gradle"
+   apply from: buildScriptApp
    // if you need but it's deprecated，viewbinding better
    apply plugin: 'kotlin-android-extensions'
    
@@ -130,30 +140,11 @@
    ```
 
 
-
-5. module(业务含UI)模块
-
-   ```
-   // 基础module
-   apply from: "$build_script_url/build-module.gradle"
-   
-   android {
-      xxx
-   }
-   
-   dependencies {
-       androidTestImplementation 'xxx'
-       implementation 'xxx'
-   }
-   ```
-
-
-
-6. lib(功能无UI)模块可直接将build修改为如下内容
+5. lib模块可直接将build修改为如下内容
 
    ```
    // 基础lib
-   apply from: "$build_script_url/build-lib.gradle"
+   apply from: buildScriptLib
    
    android {
       xxx
@@ -164,5 +155,6 @@
        implementation 'xxx'
    }
    ```
+
 
    
