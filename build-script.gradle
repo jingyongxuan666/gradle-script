@@ -1,21 +1,20 @@
-
 // 默认配置
 def defaultAndroidVersions = [
-    "compileSdk"  : 31,
-    "minSdk"      : 21,
-    "targetSdk"   : 26,
-    "gradlePlugin": "4.2.0", //  6.7.1 -> 4.2.0;    7.3  -> 7.0.3
-    "kotlin"      : "1.6.0",
+        "compileSdk"  : 31,
+        "minSdk"      : 21,
+        "targetSdk"   : 26,
+        "gradlePlugin": "4.2.0", //  6.7.1 -> 4.2.0;    7.3  -> 7.0.3
+        "kotlin"      : "1.6.0",
 ]
 
-if(!project.hasProperty("isModuleGradle")){
+if (!project.hasProperty("isModuleGradle")) {
     // 如果没有自定义配置就读取默认配置
     if (!project.hasProperty("androidVersions") || !(androidVersions instanceof Map)) {
         println("androidVersions--> without androidVersions 采用默认配置")
         ext.androidVersions = defaultAndroidVersions
     } else {
         println("androidVersions--> within androidVersions 采用自定义配置覆盖策略")
-        def setDefaultValue = { androidVersions[it] = androidVersions[it]?: defaultAndroidVersions[it] }
+        def setDefaultValue = { androidVersions[it] = androidVersions[it] ?: defaultAndroidVersions[it] }
         setDefaultValue("compileSdk")
         setDefaultValue("minSdk")
         setDefaultValue("targetSdk")
@@ -134,6 +133,7 @@ def depsVersion = [
         retrofit        : "2.9.0",
 
         rx2             : "2.2.21",
+        arouter         : "1.5.2",
 
         statefulLiveData: "1.1.0",
 
@@ -223,6 +223,10 @@ def deps = [
                 rx3Android: "io.reactivex.rxjava3:rxandroid:3.0.0",
         ],
 
+        arouter: [
+                compiler: "com.alibaba:arouter-compiler:$depsVersion.arouter",
+                api     : "com.alibaba:arouter-api:$depsVersion.arouter",
+        ],
 
         third  : [
                 statefulLiveDataCore  : "com.github.climacell.statefullivedata:core:${depsVersion.statefulLiveData}",
@@ -322,7 +326,6 @@ def build_script_url_suffix = split[1]
 ext.spliceUrl = { "$build_script_url_prefix/files/${it}.gradle/$build_script_url_suffix" }
 // http://gitlab.joyratel.com/api/v4/projects/55/repository/blobs/02ea3066dbde2643e2b7ddf9ed878be34fbee2ca/raw?ref=jsfc-1.0&private_token=EKqnZYzCypC5k8kqsV8F
 ext.spliceSecondaryUrl = { "$build_script_url_prefix/blobs/${it}/$build_script_url_suffix" }
-
 
 
 ext {

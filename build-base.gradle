@@ -17,6 +17,13 @@ android {
         consumerProguardFiles "proguard-rules.pro"
 
         flavorDimensions "versionCode"
+
+        //ARouter
+        kapt {
+            arguments {
+                arg("AROUTER_MODULE_NAME", project.getName())
+            }
+        }
     }
 
     buildTypes {
@@ -77,12 +84,16 @@ dependencies {
     implementation config.deps.kotlin.coroutines.android
     implementation config.deps.kotlin.coroutines.jdk8
 
+    // arouter
+    kapt config.deps.arouter.compiler
+    implementation config.deps.arouter.api
 
     // test
     testImplementation config.deps.test.javaJunit
     testImplementation config.deps.kotlin.coroutines.test
     androidTestImplementation config.deps.test.junit
     androidTestImplementation config.deps.test.espresso
+
 
 
 }
