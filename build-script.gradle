@@ -258,7 +258,7 @@ ext.config = [
 // https://raw.githubusercontent.com/phoenixsky/gradle-script/master/build-script.gradle
 def split = build_script_url.split("build-script.gradle")
 def build_script_url_prefix = split[0]
-def build_script_url_suffix = split[1]
+def build_script_url_suffix = split.size() > 1 ? split[1] : ""
 
 // 配置
 ext.spliceGraUrl = { "$build_script_url_prefix/${it}.gradle$build_script_url_suffix" }
