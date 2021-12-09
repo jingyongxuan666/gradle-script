@@ -79,10 +79,10 @@ dependencies {
     implementation config.deps.kotlin.coroutines.jdk8
 
     // arouter
-//    kapt config.deps.arouter.compiler
-//    implementation(config.deps.arouter.api) {
-//        exclude group: "com.android.support"
-//    }
+    kapt config.deps.arouter.compiler
+    implementation(config.deps.arouter.api) {
+        exclude group: "com.android.support"
+    }
 
     // http
     implementation config.deps.http.okhttp
