@@ -41,6 +41,7 @@ def pluginDeps = {
     classpath "com.tencent.mm:AndResGuard-gradle-plugin:1.2.20"
     // 针对gradle7.0和M1芯片适配 私有化部署
     // classpath "com.tencent.mm:AndResGuard-gradle-plugin:1.2.2102"
+
     // 字符串混淆
     classpath 'com.github.megatronking.stringfog:gradle-plugin:2.2.1'
     // 选用加解密算法库，默认实现了xor和aes-cbc两种简单算法，也可以使用自己的加解密库。
