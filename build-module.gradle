@@ -22,10 +22,10 @@ android {
 
 dependencies {
 
-    // http
-    implementation config.deps.http.okhttp
-    implementation config.deps.http.interceptorLogging
-    implementation config.deps.http.retrofit
-    implementation config.deps.http.converterGson
+    // navigation
+    implementation config.deps.android.navigation
+    implementation config.deps.android.navigationUI
+
+
 
 }

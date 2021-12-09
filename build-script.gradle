@@ -1,10 +1,10 @@
 // 默认配置
 def defaultAndroidVersions = [
-        "compileSdk"  : 31,
-        "minSdk"      : 21,
-        "targetSdk"   : 26,
-        "gradlePlugin": "4.2.0", //  6.7.1 -> 4.2.0;    7.3  -> 7.0.3
-        "kotlin"      : "1.6.0",
+    "compileSdk"  : 31,
+    "minSdk"      : 21,
+    "targetSdk"   : 26,
+    "gradlePlugin": "4.2.0", //  6.7.1 -> 4.2.0;    7.3  -> 7.0.3
+    "kotlin"      : "1.6.0",
 ]
 
 if (!project.hasProperty("isModuleGradle")) {
@@ -31,66 +31,12 @@ def repositories = {
     maven { url 'https://maven.aliyun.com/repository/public' }
     maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
     maven { url 'https://www.jitpack.io' }
-
-    maven { url 'https://developer.huawei.com/repo/' }
-
-    // 汇量
-    maven {
-        url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_china"
-    }
-    // 火山
-    maven {
-        url 'https://artifact.bytedance.com/repository/Volcengine/'
-    }
-    // 穿山甲
-    maven {
-        url 'https://artifact.bytedance.com/repository/pangle'
-    }
-    // JSFC
-    // 私有化maven
-    maven {
-        allowInsecureProtocol = true
-        url maven_releases_url
-        name "maven-releases"
-        credentials(HttpHeaderCredentials) {
-            name = 'Private-Token'
-            value = maven_releases_gitLabAccessToken
-        }
-        authentication {
-            header(HttpHeaderAuthentication)
-        }
-    }
-
-    maven {
-        allowInsecureProtocol = true
-        url maven_snapshots_url
-        name "maven-snapshots"
-        credentials(HttpHeaderCredentials) {
-            name = 'Private-Token'
-            value = maven_snapshots_gitLabAccessToken
-        }
-        authentication {
-            header(HttpHeaderAuthentication)
-        }
-    }
-
-    maven {
-        allowInsecureProtocol = true
-        url maven_3rd_url
-        credentials(HttpHeaderCredentials) {
-            name = "Private-Token"
-            value = maven_3rd_gitLabAccessToken
-        }
-        authentication {
-            header(HttpHeaderAuthentication)
-        }
-    }
-
 }
 
 def pluginDeps = {
     classpath "com.android.tools.build:gradle:${androidVersions.gradlePlugin}"
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${androidVersions.kotlin}"
+
     // 资源混淆
     classpath "com.tencent.mm:AndResGuard-gradle-plugin:1.2.20"
     // 针对gradle7.0和M1芯片适配 私有化部署
@@ -101,149 +47,143 @@ def pluginDeps = {
     classpath 'com.github.megatronking.stringfog:gradle-plugin:2.2.1'
     // 选用加解密算法库，默认实现了xor和aes-cbc两种简单算法，也可以使用自己的加解密库。
     classpath 'com.github.megatronking.stringfog:xor:1.1.0'
-    // 上传到maven的脚本插件
-    classpath "com.joyratel.plugin:uploadplugin:0.0.4-SNAPSHOT"
 
     // ↓ ↓ ↓ 项目工具 ↓ ↓ ↓
     // 依赖版本check
     classpath "com.github.ben-manes:gradle-versions-plugin:0.39.0"
-
-
 }
 
 def depsVersion = [
-        core            : "1.7.0",
-        appcompat       : "1.4.0",
-        annotation      : "1.3.0",
-        activity        : "1.4.0",
-        fragment        : "1.3.6",
-        lifecycle       : "2.4.0",
+    core            : "1.7.0",
+    appcompat       : "1.4.0",
+    annotation      : "1.3.0",
+    activity        : "1.4.0",
+    fragment        : "1.3.6",
+    lifecycle       : "2.4.0",
 
-        coroutines      : "1.5.2",
+    coroutines      : "1.5.2",
 
-        navigation      : "2.3.5",
-        startup         : "1.1.0",  // https://developer.android.com/jetpack/androidx/releases/startup
-        work            : "2.7.1",
-        sqlite          : "2.1.0",
+    navigation      : "2.3.5",
+    startup         : "1.1.0", // https://developer.android.com/jetpack/androidx/releases/startup
+    work            : "2.7.1",
+    sqlite          : "2.1.0",
 
-        collection      : "1.1.0",
-        gson            : "2.8.5",
+    collection      : "1.1.0",
+    gson            : "2.8.5",
 
-        okhttp          : "4.9.0",
-        retrofit        : "2.9.0",
+    okhttp          : "4.9.0",
+    retrofit        : "2.9.0",
 
-        rx2             : "2.2.21",
-        arouter         : "1.5.2",
+    rx2             : "2.2.21",
+    arouter         : "1.5.2",
 
-        statefulLiveData: "1.1.0",
+    statefulLiveData: "1.1.0",
 
-        // test
-        javaJunit       : "4.13.2", // https://junit.org/junit4/
-        junit           : "1.1.3",  // https://developer.android.com/jetpack/androidx/releases/test
-        espresso        : "3.4.0",
+    // test
+    javaJunit       : "4.13.2", // https://junit.org/junit4/
+    junit           : "1.1.3", // https://developer.android.com/jetpack/androidx/releases/test
+    espresso        : "3.4.0",
 ]
-
 
 def deps = [
 
-        android: [
-                core              : "androidx.core:core-ktx:${depsVersion.core}",
-                appcompat         : "androidx.appcompat:appcompat:${depsVersion.appcompat}",
-                annotation        : "androidx.annotation:annotation:${depsVersion.annotation}",
-                activity          : "androidx.activity:activity:${depsVersion.activity}",
-                activityKtx       : "androidx.activity:activity-ktx:${depsVersion.activity}",
-                fragment          : "androidx.fragment:fragment:${depsVersion.fragment}",
-                fragmentKtx       : "androidx.fragment:fragment-ktx:${depsVersion.fragment}",
+    android: [
+        core              : "androidx.core:core-ktx:${depsVersion.core}",
+        appcompat         : "androidx.appcompat:appcompat:${depsVersion.appcompat}",
+        annotation        : "androidx.annotation:annotation:${depsVersion.annotation}",
+        activity          : "androidx.activity:activity:${depsVersion.activity}",
+        activityKtx       : "androidx.activity:activity-ktx:${depsVersion.activity}",
+        fragment          : "androidx.fragment:fragment:${depsVersion.fragment}",
+        fragmentKtx       : "androidx.fragment:fragment-ktx:${depsVersion.fragment}",
 
-                // lifecycle
-                lifecycle         : "androidx.lifecycle:lifecycle-runtime:${depsVersion.lifecycle}",
-                lifecycleKtx      : "androidx.lifecycle:lifecycle-runtime-ktx:${depsVersion.lifecycle}",
-                lifecycleProcess  : "androidx.lifecycle:lifecycle-process:${depsVersion.lifecycle}",
-                viewmodel         : "androidx.lifecycle:lifecycle-viewmodel:${depsVersion.lifecycle}",
-                viewmodelKtx      : "androidx.lifecycle:lifecycle-viewmodel-ktx:${depsVersion.lifecycle}",
-                viewmodelSavestate: "androidx.lifecycle:lifecycle-viewmodel-savedstate:${depsVersion.lifecycle}",
-                livedata          : "androidx.lifecycle:lifecycle-livedata:${depsVersion.lifecycle}",
-                livedataktx       : "androidx.lifecycle:lifecycle-livedata-ktx:${depsVersion.lifecycle}",
-                livedataCore      : "androidx.lifecycle:lifecycle-livedata-core:${depsVersion.lifecycle}",
-                livedataCoreKtx   : "androidx.lifecycle:lifecycle-livedata-core-ktx:${depsVersion.lifecycle}",
-                reactivestreams   : "androidx.lifecycle:lifecycle-reactivestreams:${depsVersion.lifecycle}",
+        // lifecycle
+        lifecycle         : "androidx.lifecycle:lifecycle-runtime:${depsVersion.lifecycle}",
+        lifecycleKtx      : "androidx.lifecycle:lifecycle-runtime-ktx:${depsVersion.lifecycle}",
+        lifecycleProcess  : "androidx.lifecycle:lifecycle-process:${depsVersion.lifecycle}",
+        viewmodel         : "androidx.lifecycle:lifecycle-viewmodel:${depsVersion.lifecycle}",
+        viewmodelKtx      : "androidx.lifecycle:lifecycle-viewmodel-ktx:${depsVersion.lifecycle}",
+        viewmodelSavestate: "androidx.lifecycle:lifecycle-viewmodel-savedstate:${depsVersion.lifecycle}",
+        livedata          : "androidx.lifecycle:lifecycle-livedata:${depsVersion.lifecycle}",
+        livedataktx       : "androidx.lifecycle:lifecycle-livedata-ktx:${depsVersion.lifecycle}",
+        livedataCore      : "androidx.lifecycle:lifecycle-livedata-core:${depsVersion.lifecycle}",
+        livedataCoreKtx   : "androidx.lifecycle:lifecycle-livedata-core-ktx:${depsVersion.lifecycle}",
+        reactivestreams   : "androidx.lifecycle:lifecycle-reactivestreams:${depsVersion.lifecycle}",
 
-                // navigation
-                navigation        : "androidx.navigation:navigation-fragment-ktx:${depsVersion.navigation}",
-                navigationUI      : "androidx.navigation:navigation-ui-ktx:${depsVersion.navigation}",
+        // navigation
+        navigation        : "androidx.navigation:navigation-fragment-ktx:${depsVersion.navigation}",
+        navigationUI      : "androidx.navigation:navigation-ui-ktx:${depsVersion.navigation}",
 
-                // component
-                startup           : "androidx.startup:startup-runtime:${depsVersion.startup}",
-                work              : "androidx.work:work-runtime:${depsVersion.work}",
-                workKtx           : "androidx.work:work-runtime-ktx:${depsVersion.work}",
-                sqlite            : "androidx.sqlite:sqlite:${depsVersion.sqlite}",
-                multidex          : "androidx.multidex:multidex:2.0.1",
+        // component
+        startup           : "androidx.startup:startup-runtime:${depsVersion.startup}",
+        work              : "androidx.work:work-runtime:${depsVersion.work}",
+        workKtx           : "androidx.work:work-runtime-ktx:${depsVersion.work}",
+        sqlite            : "androidx.sqlite:sqlite:${depsVersion.sqlite}",
+        multidex          : "androidx.multidex:multidex:2.0.1",
 
-                // data
-                collection        : "androidx.collection:collection-ktx:${depsVersion.collection}",
+        // data
+        collection        : "androidx.collection:collection-ktx:${depsVersion.collection}",
 
-                // UI
-                material          : "com.google.android.material:material:1.4.0",
-                constraintlayout  : "androidx.constraintlayout:constraintlayout:2.1.1",
-                recyclerview      : "androidx.recyclerview:recyclerview:1.2.1",
-                swiperefreshlayout: "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0",
-                cardview          : "androidx.cardview:cardview:1.0.0",
-                flexbox           : "com.google.android.flexbox:flexbox:3.0.0",
+        // UI
+        material          : "com.google.android.material:material:1.4.0",
+        constraintlayout  : "androidx.constraintlayout:constraintlayout:2.1.1",
+        recyclerview      : "androidx.recyclerview:recyclerview:1.2.1",
+        swiperefreshlayout: "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0",
+        cardview          : "androidx.cardview:cardview:1.0.0",
+        flexbox           : "com.google.android.flexbox:flexbox:3.0.0",
 
-                // base
-                gson              : "com.google.code.gson:gson:${depsVersion.gson}",
+        // base
+        gson              : "com.google.code.gson:gson:${depsVersion.gson}",
 
+    ],
+    kotlin : [
+        stdlibCommon: "org.jetbrains.kotlin:kotlin-stdlib-common:${androidVersions.kotlin}",
+        stdlib      : "org.jetbrains.kotlin:kotlin-stdlib:${androidVersions.kotlin}",
+        stdlib7     : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${androidVersions.kotlin}",
+        stdlib8     : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${androidVersions.kotlin}",
+
+        coroutines  : [
+            coreJvm: "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:${depsVersion.coroutines}",
+            android: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${depsVersion.coroutines}",
+            jdk8   : "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${depsVersion.coroutines}",
+            rx2    : "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:${depsVersion.coroutines}",
+            test   : "org.jetbrains.kotlinx:kotlinx-coroutines-test:${depsVersion.coroutines}",
         ],
-        kotlin : [
-                stdlibCommon: "org.jetbrains.kotlin:kotlin-stdlib-common:${androidVersions.kotlin}",
-                stdlib      : "org.jetbrains.kotlin:kotlin-stdlib:${androidVersions.kotlin}",
-                stdlib7     : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${androidVersions.kotlin}",
-                stdlib8     : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${androidVersions.kotlin}",
+    ],
 
-                coroutines  : [
-                        coreJvm: "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:${depsVersion.coroutines}",
-                        android: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${depsVersion.coroutines}",
-                        jdk8   : "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${depsVersion.coroutines}",
-                        rx2    : "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:${depsVersion.coroutines}",
-                        test   : "org.jetbrains.kotlinx:kotlinx-coroutines-test:${depsVersion.coroutines}",
-                ],
-        ],
+    http   : [
+        okhttp            : "com.squareup.okhttp3:okhttp:${depsVersion.okhttp}",
+        interceptorLogging: "com.squareup.okhttp3:logging-interceptor:${depsVersion.okhttp}",
+        retrofit          : "com.squareup.retrofit2:retrofit:${depsVersion.retrofit}",
+        converterGson     : "com.squareup.retrofit2:converter-gson:${depsVersion.retrofit}",
+    ],
 
-        http   : [
-                okhttp            : "com.squareup.okhttp3:okhttp:${depsVersion.okhttp}",
-                interceptorLogging: "com.squareup.okhttp3:logging-interceptor:${depsVersion.okhttp}",
-                retrofit          : "com.squareup.retrofit2:retrofit:${depsVersion.retrofit}",
-                converterGson     : "com.squareup.retrofit2:converter-gson:${depsVersion.retrofit}",
-        ],
+    rx     : [
+        rx2       : "io.reactivex.rxjava2:rxjava:$depsVersion.rx2",
+        rx2Android: "io.reactivex.rxjava2:rxandroid:2.1.1",
+        rx3       : "io.reactivex.rxjava3:rxjava3:$depsVersion.rx3",
+        rx3Android: "io.reactivex.rxjava3:rxandroid:3.0.0",
+    ],
 
-        rx     : [
-                rx2       : "io.reactivex.rxjava2:rxjava:$depsVersion.rx2",
-                rx2Android: "io.reactivex.rxjava2:rxandroid:2.1.1",
-                rx3       : "io.reactivex.rxjava3:rxjava3:$depsVersion.rx3",
-                rx3Android: "io.reactivex.rxjava3:rxandroid:3.0.0",
-        ],
+    arouter: [
+        compiler: "com.alibaba:arouter-compiler:$depsVersion.arouter",
+        api     : "com.alibaba:arouter-api:$depsVersion.arouter",
+    ],
 
-        arouter: [
-                compiler: "com.alibaba:arouter-compiler:$depsVersion.arouter",
-                api     : "com.alibaba:arouter-api:$depsVersion.arouter",
-        ],
+    third  : [
+        statefulLiveDataCore  : "com.github.climacell.statefullivedata:core:${depsVersion.statefulLiveData}",
+        statefulLiveCoroutines: "com.github.climacell.statefullivedata:coroutines:${depsVersion.statefulLiveData}",
+        statefulLiveRetrofit  : "com.github.climacell.statefullivedata:retrofit:${depsVersion.statefulLiveData}",
 
-        third  : [
-                statefulLiveDataCore  : "com.github.climacell.statefullivedata:core:${depsVersion.statefulLiveData}",
-                statefulLiveCoroutines: "com.github.climacell.statefullivedata:coroutines:${depsVersion.statefulLiveData}",
-                statefulLiveRetrofit  : "com.github.climacell.statefullivedata:retrofit:${depsVersion.statefulLiveData}",
-
-                x5webview             : "com.tencent.tbs:tbssdk:44085",
-        ],
+        x5webview             : "com.tencent.tbs:tbssdk:44085",
+    ],
 
 
-        test   : [
-                javaJunit: "junit:junit:${depsVersion.javaJunit}",
-                junit    : "androidx.test.ext:junit-ktx:${depsVersion.junit}",
-                espresso : "androidx.test.espresso:espresso-core:${depsVersion.espresso}",
-                core     : "androidx.test:core-ktx:1.4.0",
-        ],
-
+    test   : [
+        javaJunit: "junit:junit:${depsVersion.javaJunit}",
+        junit    : "androidx.test.ext:junit-ktx:${depsVersion.junit}",
+        espresso : "androidx.test.espresso:espresso-core:${depsVersion.espresso}",
+        core     : "androidx.test:core-ktx:1.4.0",
+    ],
 
 ]
 
@@ -294,7 +234,6 @@ def resolutionStrategy = {
     force deps.kotlin.coroutines.rx2
     force deps.kotlin.coroutines.test
 
-
     force deps.rx.rx2
     force deps.rx.rx2Android
     force deps.rx.rx3
@@ -307,43 +246,38 @@ def resolutionStrategy = {
     force deps.test.espresso
 }
 
-
 // ⚠️必须在底部，新增属性需在在这里添加
 ext.config = [
-        "repositories"      : repositories,
-        "pluginDeps"        : pluginDeps,
-        "resolutionStrategy": resolutionStrategy,
-        "deps"              : deps,
+    "repositories"      : repositories,
+    "pluginDeps"        : pluginDeps,
+    "resolutionStrategy": resolutionStrategy,
+    "deps"              : deps,
 ]
 
 
-def split = build_script_url.split("/files/build-script.gradle/")
+// https://raw.githubusercontent.com/phoenixsky/gradle-script/master/build-script.gradle
+def split = build_script_url.split("build-script.gradle")
 def build_script_url_prefix = split[0]
 def build_script_url_suffix = split[1]
 
 // 配置
-// http://gitlab.joyratel.com/api/v4/projects/55/repository/files/build-script.gradle/raw?ref=jsfc-1.0&private_token=EKqnZYzCypC5k8kqsV8F
-ext.spliceUrl = { "$build_script_url_prefix/files/${it}.gradle/$build_script_url_suffix" }
-// http://gitlab.joyratel.com/api/v4/projects/55/repository/blobs/02ea3066dbde2643e2b7ddf9ed878be34fbee2ca/raw?ref=jsfc-1.0&private_token=EKqnZYzCypC5k8kqsV8F
-ext.spliceSecondaryUrl = { "$build_script_url_prefix/blobs/${it}/$build_script_url_suffix" }
-
+ext.spliceGraUrl = { "$build_script_url_prefix/${it}.gradle$build_script_url_suffix" }
 
 ext {
     buildScript = spliceUrl("build-script")
     buildScriptBase = spliceUrl("build-base")
-    buildScriptModule = spliceUrl("build-module")
     buildScriptLib = spliceUrl("build-lib")
+    buildScriptModule = spliceUrl("build-module")
     buildScriptApp = spliceUrl("build-app")
 
     // 二级目录
-    // 因当前gitlab配置问题需要暂时使用blob获取
-    buildScriptAndResGuard = spliceSecondaryUrl("88307703eaa8cd548f944ac80ba66fcf44d7f0f9")
+    buildScriptAndResGuard = spliceUrl("feature/android-res-guard")
 
-    buildScriptMavenPublishAAR3rd = spliceSecondaryUrl("4df6e9d13b819badc4c61bfb78dd59b5512f84e9")
-    buildScriptMavenPublishAAR3rdDeps = spliceSecondaryUrl("320428f3d3a20defaaa3ec572e4bbb9136f2be9f")
-    buildScriptMavenPublishAAR = spliceSecondaryUrl("5015e5a238973ffbd67db5fb76847a6d796c9290")
-    buildScriptMavenPublishModule = spliceSecondaryUrl("16a98ac448e95c3ada1addc37e9f4bb60d2bac98")
-    buildScriptMavenPublishScript = spliceSecondaryUrl("81fec155fe693a56ebef294e607072ca40b30860")
+    buildScriptMavenPublishAAR3rdDeps = spliceUrl("maven/publish-aar-3rd-deps")
+    buildScriptMavenPublishAAR3rd = spliceUrl("maven/publish-aar-3rd")
+    buildScriptMavenPublishAAR = spliceUrl("maven/publish-aar")
+    buildScriptMavenPublishModule = spliceUrl("maven/publish-module")
+    buildScriptMavenPublishScript = spliceUrl("maven/publish-script")
 }
 
 

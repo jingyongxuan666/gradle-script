@@ -15,25 +15,20 @@
 
 # 模块化module相关的定义
 
-1. `app`为壳工程，直接`apply from: buildScriptApp`
-2. `lib`为module，直接`apply from: buildScriptLib`
+
+1. `app`为壳工程
+    `apply from: buildScriptApp`
+2. `module-xxx`为业务模块，含UI（订单模块、用户登录模块）
+    `apply from: buildScriptLib`
+3. `lib-xxx`为基础模块，无UI（网络库、垃圾清理、JSBridge）
+    `apply from: buildScriptLib`
 
 # 使用方式
 
 1. 在项目根目录的`gradle.properties`文件中添加以下内容
    ```
    # gradle-script脚本地址
-   build_script_url = http://gitlab.joyratel.com/api/v4/projects/58/repository/files/build-script.gradle/raw?ref=jsfc-0.0.1&private_token=2QgyTHT3FBpyYPqrQjA_
-   
-   # 加入maven仓库的地址和token
-   maven_releases_url=http://gitlab.joyratel.com/api/v4/projects/46/packages/maven
-   maven_releases_gitLabAccessToken=xxx
-
-   maven_snapshots_url=http://gitlab.joyratel.com/api/v4/projects/47/packages/maven
-   maven_snapshots_gitLabAccessToken=xxx
-
-   maven_3rd_url=http://gitlab.joyratel.com/api/v4/projects/54/packages/maven
-   maven_3rd_gitLabAccessToken=xxx
+   build_script_url = https://raw.githubusercontent.com/phoenixsky/gradle-script/master/build-script.gradle
    ```
 
 2. 修改project的build.gradle文件
@@ -139,8 +134,23 @@
    }
    ```
 
-
 5. lib模块可直接将build修改为如下内容
+
+   ```
+   // 基础lib
+   apply from: buildScriptModule
+
+   android {
+      xxx
+   }
+
+   dependencies {
+       androidTestImplementation 'xxx'
+       implementation 'xxx'
+   }
+   ```
+
+6. lib模块可直接将build修改为如下内容
 
    ```
    // 基础lib
